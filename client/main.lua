@@ -35,8 +35,8 @@ CreateThread(function()
 
     exports.interact:AddLocalEntityInteraction({
         entity = ped,
-        id = 'sellerInteraction', -- Unique identifier for this interaction
-        distance = 2.5, -- Distance for the interaction to be accessible
+        id = 'sellerInteraction',
+        distance = 2.5,
         options = {
             {
                 label = 'Talk to Seller',
@@ -54,7 +54,7 @@ function openShopsMenu()
             id = 1,
             isMenuHeader = true,
             header = '🛒 Supermarkets',
-            icon = 'fas fa-store', -- أيقونة المتجر من Font Awesome
+            icon = 'fas fa-store',
             txt = 'Choose a shop to purchase and manage it.'
         },
     }
@@ -64,7 +64,7 @@ function openShopsMenu()
             id = k,
             header = v.name,
             txt = 'Price: $' .. v.price,
-            icon = 'fas fa-shopping-cart', -- أيقونة لكل متجر
+            icon = 'fas fa-shopping-cart',
             params = {
                 event = 'nmsh-supermarkets:openMarketActionsMenu',
                 args = {
@@ -76,22 +76,19 @@ function openShopsMenu()
         })
     end
 
-    -- خيار الإغلاق
     table.insert(Menu, {
         id = #Menu + 1,
         header = '❌ Close',
         txt = 'Exit the shop selection menu.',
-        icon = 'fas fa-times-circle', -- أيقونة إغلاق
+        icon = 'fas fa-times-circle', 
         params = {
             event = 'qb-menu:client:closeMenu'
         }
     })
 
-    -- فتح القائمة
     exports[s.menu]:openMenu(Menu)
 end
 
--- الحدث لفتح قائمة الأفعال لكل متجر
 RegisterNetEvent('nmsh-supermarkets:openMarketActionsMenu', function(data)
     local marketActionsMenu = {
         {
@@ -172,14 +169,12 @@ end
 
 CreateThread(function()
     for shopId, supermarket in pairs(Nmsh['Supermarkets']) do
-        -- Define the seller model and request it
         local sellerModel = GetHashKey(supermarket.npc.model)
         RequestModel(sellerModel)
         while not HasModelLoaded(sellerModel) do
             Wait(1)
         end
 
-        -- Create the seller ped
         local sellerPed = CreatePed(0, sellerModel, supermarket.npc.coords, false, false)
         SetEntityHeading(sellerPed, supermarket.npc.heading)
         SetPedFleeAttributes(sellerPed, 0, 0)
@@ -190,18 +185,18 @@ CreateThread(function()
         SetEntityInvincible(sellerPed, true)
         FreezeEntityPosition(sellerPed, true)
         SetEntityCoordsNoOffset(sellerPed, supermarket.npc.coords, false, false, false, true)
-        -- Add an interaction to the seller ped
+
         exports.interact:AddLocalEntityInteraction({
             entity = sellerPed,
             offset = vec3(0.0, 0.0, 0.2), -- optional
-            id = 'shopsellerInteraction_' .. shopId, -- Unique identifier for each interaction
-            distance = 6.0, -- Distance for the interaction to be accessible
+            id = 'shopsellerInteraction_' .. shopId,
+            distance = 6.0,
             interactDst = 5.0,
             options = {
                 {
                     label = 'Talk to Seller',
                     action = function(entity, coords, args)
-                        -- Trigger the event to open the closest shop menu for customers
+
                         TriggerEvent('nmsh-supermarkets:openSellerMenu', shopId)
                     end,
                 },
@@ -226,25 +221,22 @@ CreateThread(function()
         SetEntityInvincible(managerPed, true)
         FreezeEntityPosition(managerPed, true)
         SetEntityCoordsNoOffset(managerPed, supermarket.manager.coords, false, false, false, true)
-        -- Add an interaction to the manager ped (for management menu)
+
         exports.interact:AddLocalEntityInteraction({
             entity = managerPed,
-            offset = vec3(0.0, 0.0, 0.2), -- optional
-            id = 'shopmanagerInteraction_' .. shopId, -- Unique identifier for manager interaction
-            distance = 6.0, -- Distance for the interaction to be accessible
+            offset = vec3(0.0, 0.0, 0.2),
+            id = 'shopmanagerInteraction_' .. shopId,
+            distance = 6.0,
             interactDst = 5.0,
             options = {
                 {
                     label = 'Access Management Menu',
                     action = function(entity, coords, args)
-                        -- Trigger the callback to check if the player is the shop owner
                         QBCore.Functions.TriggerCallback('nmsh-supermarkets:isShopOwner', function(isOwner)
                             if isOwner then
-                                -- Open the management menu if the player is the owner
                                 print(shopId)
                                 TriggerEvent('nmsh-supermarkets:openManagementMenu', shopId)
                             else
-                                -- Notify the player if they are not the owner
                                 TriggerEvent('QBCore:Notify', 'You are not authorized to access the management menu.', 'error')
                             end
                         end, shopId)
