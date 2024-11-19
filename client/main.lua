@@ -3,14 +3,12 @@ local QBCore = exports[s.core]:GetCoreObject()
 local playerBasket = {}
 
 CreateThread(function()
-    -- Define the model and request it
     local model = GetHashKey(Nmsh['Seller-NPC'].model)
     RequestModel(model)
     while not HasModelLoaded(model) do
         Wait(1)
     end
     
-    -- Create the ped
     local ped = CreatePed(0, model, Nmsh['Seller-NPC'].coords, false, false)
     SetEntityHeading(ped, Nmsh['Seller-NPC'].heading)
     SetPedFleeAttributes(ped, 0, 0)
@@ -24,19 +22,17 @@ CreateThread(function()
 
     local sellerBlip = AddBlipForCoord(Nmsh['Seller-NPC'].coords.x, Nmsh['Seller-NPC'].coords.y, Nmsh['Seller-NPC'].coords.z)
 
-    -- Set blip properties
     SetBlipSprite(sellerBlip, Nmsh['Seller-NPC'].blip.sprite)
-    SetBlipDisplay(sellerBlip, 4) -- Display blip on all maps
+    SetBlipDisplay(sellerBlip, 4)
     SetBlipScale(sellerBlip, Nmsh['Seller-NPC'].blip.scale)
     SetBlipColour(sellerBlip, Nmsh['Seller-NPC'].blip.color)
-    SetBlipAsShortRange(sellerBlip, true) -- Make the blip visible only when close
+    SetBlipAsShortRange(sellerBlip, true)
 
     -- Set the blip name
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentString(Nmsh['Seller-NPC'].blip.name)
     EndTextCommandSetBlipName(sellerBlip)
 
-    -- Add an interaction to the ped
     exports.interact:AddLocalEntityInteraction({
         entity = ped,
         id = 'sellerInteraction', -- Unique identifier for this interaction
@@ -142,14 +138,12 @@ RegisterNetEvent('nmsh-supermarkets:openMarketActionsMenu', function(data)
         }
     }
 
-    -- فتح القائمة الخاصة بالمتجر المحدد
     exports[s.menu]:openMenu(marketActionsMenu)
 end)
 
--- الحدث لإضافة نقطة الطريق (waypoint) إلى موقع المتجر
 RegisterNetEvent('nmsh-supermarkets:setWaypoint', function(data)
     local coords = data.coords
-    SetNewWaypoint(coords.x, coords.y) -- تحديد نقطة الطريق على الخريطة باستخدام الإحداثيات
+    SetNewWaypoint(coords.x, coords.y)
     TriggerEvent('QBCore:Notify', 'Waypoint set to the selected supermarket.', 'success')
 end)
 
